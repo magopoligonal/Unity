@@ -27,10 +27,9 @@ public class InputManager : MonoBehaviour
 
     public void WalkPressed(InputAction.CallbackContext input)
     {
-        if(input.performed)
-        {
+        
             OnWalking?.Invoke(input);
-        }
+        
     }
 
     public void JumpPressed(InputAction.CallbackContext input)
@@ -39,5 +38,11 @@ public class InputManager : MonoBehaviour
         {
             OnJump?.Invoke(input);
         }
+    }
+
+    public void RunPressed(InputAction.CallbackContext input)
+    {
+        //retirado para ver se o valor do input passa corretamente. Não estou conseguindo pegar o input.performed e input.canceled em player movement
+        OnRunning?.Invoke(input);
     }
 }

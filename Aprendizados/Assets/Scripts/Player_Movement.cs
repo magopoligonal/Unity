@@ -12,6 +12,7 @@ public class Player_Movement : MonoBehaviour
     public bool IsFacingRight {get; private set;}
     //referencias
     [SerializeField] private GameObject _player;
+    [SerializeField] private Rigidbody2D _rb;
 //metodos
         //system
 
@@ -19,6 +20,8 @@ public class Player_Movement : MonoBehaviour
     {
         if(_player == null)
         _player = GameObject.FindWithTag("Player");
+
+        _rb = GetComponent<Rigidbody2D>();
     }
 
     void OnEnable()
@@ -39,6 +42,8 @@ public class Player_Movement : MonoBehaviour
         ainda não sei como faria isso
             obs 2: em um ataque comum não se espera que o player ande, então talvez zerar o movimento quando currentPlayerState mudar
         */
+        
+        _rb.linearVelocity = new Vector3(_horizontalMovement * _runningSpeed, _rb.linearVelocity.y, 0f);
 
     }
 
@@ -50,16 +55,17 @@ public class Player_Movement : MonoBehaviour
     private void Walk(InputAction.CallbackContext input)
     {
         _horizontalMovement = input.ReadValue<Vector2>().x * _speed * Time.deltaTime;
-        _horizontalMovement *= IsFacingRight ? 1f : -1f; //verifica se está virado para direita caso esteja o X(movimento horizontal) multiplica por 1 para ir para direita
-        _horizontalMovement *= _runningSpeed;
-         transform.position += new Vector3(_horizontalMovement, 0f, 0f);
+        //_horizontalMovement *= IsFacingRight ? 1f : -1f; //verifica se está virado para direita caso esteja o X(movimento horizontal) multiplica por 1 para ir para direita
+        //_horizontalMovement *= _runningSpeed;
+         Debug.Log("Está andando!");
     }
 
     private void Run(InputAction.CallbackContext input)
     {
         if(input.performed)
-        _runningSpeed += _runningModifier; 
+        _runningSpeed = (1 + _runningModifier); 
         else if(input.canceled)
         _runningSpeed = 1f;
+        Debug.Log("Está correndo!");
     }
 }
