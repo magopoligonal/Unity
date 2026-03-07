@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     //enums
     public enum PlayerState
     {
-        Spawning, //fico imaginando que seria interessante ter isso para que eu possar por uma animação toda vez que o player nascer/renascer, mas não sei a melhor forma de implementar, talvez aqui mesmo nessa classe?
+        Spawning, 
         Idle,
         Walking,
         Running,
@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
         Dead
     }
     private PlayerState currentPlayerState = PlayerState.Spawning; //mesmo não sabendo como implementar o Spawning ainda, acho que faz sentido ser o valor default
+    
+
 //methods
     //system
     void OnEnable()

@@ -821,7 +821,6 @@ GameObject:
   - component: {fileID: 1654460678}
   - component: {fileID: 1654460681}
   - component: {fileID: 1654460682}
-  - component: {fileID: 1654460685}
   - component: {fileID: 1654460684}
   - component: {fileID: 1654460683}
   m_Layer: 0
@@ -943,6 +942,7 @@ MonoBehaviour:
   _runningSpeed: 1
   _runningModifier: 0.2
   _horizontalMovement: 0
+  _player: {fileID: 0}
   _rb: {fileID: 0}
 --- !u!114 &1654460682
 MonoBehaviour:
@@ -1020,20 +1020,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &1654460685
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1654460677}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2cf200b7cd770dae81ffaabd8905c1a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimator
-  _animator: {fileID: 0}
-  _spriteRenderer: {fileID: 0}
 --- !u!1 &1871883583
 GameObject:
   m_ObjectHideFlags: 0

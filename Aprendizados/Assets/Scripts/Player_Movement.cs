@@ -11,16 +11,15 @@ public class Player_Movement : MonoBehaviour
     [SerializeField] private float _horizontalMovement = 0f;
     public bool IsFacingRight {get; private set;}
     //referencias
-    [SerializeField] private GameObject _player;
     [SerializeField] private Rigidbody2D _rb;
+
+    //Events
+    public static event Action<bool> hasSideChanged;
 //metodos
         //system
 
     void Awake()
     {
-        if(_player == null)
-        _player = GameObject.FindWithTag("Player");
-
         _rb = GetComponent<Rigidbody2D>();
     }
 
@@ -54,8 +53,16 @@ public class Player_Movement : MonoBehaviour
     */
     private void Walk(InputAction.CallbackContext input)
     {
-        _horizontalMovement = input.ReadValue<Vector2>().x * _speed * Time.deltaTime;
-        //_horizontalMovement *= IsFacingRight ? 1f : -1f; //verifica se está virado para direita caso esteja o X(movimento horizontal) multiplica por 1 para ir para direita
+        //verifica o valor do input se foi positivo ou negativo
+        if(input.ReadValue<Vector2>().x >= 0)
+        IsFacingRight = true;
+        else
+        IsFacingRight = false;
+        //avisa para quem quiser ouvir que o lado mudou
+        hasSideChanged?.Invoke(IsFacingRight);
+
+        _horizontalMovement = input.ReadValue<Vector2>().x * _speed; //aparentemente não precisa do Time.deltaTime nem Time.fixedDeltaTime
+        
         //_horizontalMovement *= _runningSpeed;
          Debug.Log("Está andando!");
     }
@@ -63,7 +70,7 @@ public class Player_Movement : MonoBehaviour
     private void Run(InputAction.CallbackContext input)
     {
         if(input.performed)
-        _runningSpeed = (1 + _runningModifier); 
+        _runningSpeed = (1 + _runningModifier);  //é correto usar esse 1 + var ? a ideia veio de como fazemos conta de porcentagem.
         else if(input.canceled)
         _runningSpeed = 1f;
         Debug.Log("Está correndo!");
