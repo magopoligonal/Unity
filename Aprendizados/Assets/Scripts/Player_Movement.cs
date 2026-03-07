@@ -14,7 +14,7 @@ public class Player_Movement : MonoBehaviour
     [SerializeField] private Rigidbody2D _rb;
 
     //Events
-    public static event Action<bool> hasSideChanged;
+    //public static event Action<bool> hasSideChanged;
 //metodos
         //system
 
@@ -53,17 +53,21 @@ public class Player_Movement : MonoBehaviour
     */
     private void Walk(InputAction.CallbackContext input)
     {
-        //verifica o valor do input se foi positivo ou negativo
-        if(input.ReadValue<Vector2>().x >= 0)
-        IsFacingRight = true;
-        else
-        IsFacingRight = false;
+        bool lastSide;
+        //verifica o valor do input se foi positivo ou negativo, caso seja 0 ele armazena o último valor e assim sabemos o lado que a sprite virou por ultimo
+        if(input.ReadValue<Vector2>().x > 0)
+        lastSide = true;
+        else if (input.ReadValue<Vector2>().x < 0)
+        lastSide = false;
+        else 
+        lastSide = IsFacingRight;
+        
+        IsFacingRight = lastSide;
+            
         //avisa para quem quiser ouvir que o lado mudou
-        hasSideChanged?.Invoke(IsFacingRight);
+        PlayerController.hasSideChanged?.Invoke(IsFacingRight);
 
         _horizontalMovement = input.ReadValue<Vector2>().x * _speed; //aparentemente não precisa do Time.deltaTime nem Time.fixedDeltaTime
-        
-        //_horizontalMovement *= _runningSpeed;
          Debug.Log("Está andando!");
     }
 

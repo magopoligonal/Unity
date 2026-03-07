@@ -19,7 +19,8 @@ public class PlayerController : MonoBehaviour
     }
     private PlayerState currentPlayerState = PlayerState.Spawning; //mesmo não sabendo como implementar o Spawning ainda, acho que faz sentido ser o valor default
     
-
+    //Events
+    public static  Action<bool> hasSideChanged;
 //methods
     //system
     void OnEnable()

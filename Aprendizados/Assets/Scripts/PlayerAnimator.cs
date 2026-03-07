@@ -6,7 +6,8 @@ public class PlayerAnimator : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
     [SerializeField] private SpriteRenderer _spriteRenderer;
-
+    //Events
+    
 
     void Awake()
     {
@@ -21,11 +22,12 @@ public class PlayerAnimator : MonoBehaviour
         InputManager.OnRunning += Run;
         InputManager.OnJump += Jump;
         InputManager.OnAttack += Attack;
-        //falta pensar e criar um claasse que disparara OnDeath e OnSpawning
+        //falta pensar e criar um classe que disparara OnDeath e OnSpawning
         //tambem falta pensar uma forma de voltar para o Idle ou ele volta sozinho por causa do animator?
 
         //SpriteRenderer
-        Player_Movement.hasSideChanged += FlipSprite;
+        
+        PlayerController.hasSideChanged += FlipSprite;
 
     }
     void OnDisable()
@@ -36,7 +38,8 @@ public class PlayerAnimator : MonoBehaviour
         InputManager.OnJump -= Jump;
         InputManager.OnAttack -= Attack;
         //SpriteRenderer
-        Player_Movement.hasSideChanged -= FlipSprite;
+        
+        PlayerController.hasSideChanged -= FlipSprite;
     }
 
     /*  Ok nesse estagio de programar os metodos eu me peguei pensando: ter o controle de .started .performed e .canceled pode ser util para as animacoes?
@@ -81,15 +84,8 @@ public class PlayerAnimator : MonoBehaviour
         Vector3 scale = transform.localScale;
         if(isRightSide)
         scale.x = 1f;
-        
-        //_spriteRenderer.flipX = false;
         else
         scale.x = -1f;
-        //_spriteRenderer.flipX = true;
-        /*
-        * Funcionou bem essa função mas imagino que vamos entrar no problema de não virar os outros elementos do objeto Player
-        * Porém fiquei na dúvida de como implementar o Transform.scale, até pensei de coloca-lo no player movement e lembrei do pq da referencia ao player.
-        */
         transform.localScale = scale;
     }
 
