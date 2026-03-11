@@ -1,11 +1,10 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.XR;
 
 public class PlayerController : MonoBehaviour
 {
-    //variables - Properties
-    public bool IsGrounded {get; private set;}
     //enums
     public enum PlayerState
     {
@@ -17,10 +16,26 @@ public class PlayerController : MonoBehaviour
         Jumping,
         Dead
     }
-    private PlayerState currentPlayerState = PlayerState.Spawning; //mesmo não sabendo como implementar o Spawning ainda, acho que faz sentido ser o valor default
+//variables 
+    //fields
+    [SerializeField] private PlayerState _currentPlayerState = PlayerState.Idle;
     
+    //Properties
+    public bool IsGrounded {get; private set;}
+    public PlayerState CurrentPlayerState
+    {
+        get{ return _currentPlayerState; }
+        set
+        {
+            _currentPlayerState = value;
+        }
+    }
+
     //Events
+    public static  Action<PlayerState> OnStateChanged;
     public static  Action<bool> hasSideChanged;
+    
+
 //methods
     //system
     void OnEnable()
@@ -31,6 +46,16 @@ public class PlayerController : MonoBehaviour
         InputManager.OnRunning += Run;
         InputManager.OnJump += Jump;
         InputManager.OnAttack += Attack;
+        
+        //PlayerController
+        OnStateChanged += HandleStateChange;
+        
+        //PlayerCollision                  
+        PlayerCollision.OnReachingGround += CheckGround;
+
+        //PlayerMovement
+        
+        
     }
 
     void OnDisable()
@@ -39,40 +64,92 @@ public class PlayerController : MonoBehaviour
         InputManager.OnRunning -= Run;
         InputManager.OnJump -= Jump;
         InputManager.OnAttack -= Attack;
+        
+        //PlayerController
+        OnStateChanged -= OnStateChanged;
+        
+        //PlayerMovement
+        
+        
+        //PlayerCollision
+        PlayerCollision.OnReachingGround -= CheckGround;
     }
 
     //playerController
     private void Attack(InputAction.CallbackContext input) //esse parametro está vindo lá do InputManager
     {
-        //TO-DO porque ainda não sei
+        //TO-DO porquê ainda não sei
         //ativar animação de ataque
         //tocar som
-        if(currentPlayerState == PlayerState.Jumping) //Coloquei apenas para testar a lógica
+        if(CurrentPlayerState == PlayerState.Jumping) //Coloquei apenas para testar a lógica
         return;
 
-        currentPlayerState = PlayerState.Attacking;
+        OnStateChanged?.Invoke(PlayerState.Attacking);
         //imagino que não seja aqui que vejamos se o dano foi aplicado, ele apenas ataca né?
         //eu imagino uma interação de ataque onde a personagem esteja pulando como no Grand Chase, mas caso contrario eu poderia verificar se o currentPlayerState é Jumping para impedir né ? 
     }
 
     private void Run(InputAction.CallbackContext input)
     {
-        currentPlayerState = PlayerState.Running;
+        OnStateChanged?.Invoke(PlayerState.Running);
     }
 
     private void Walk(InputAction.CallbackContext input)
     {
-        currentPlayerState = PlayerState.Walking;
+        //se não está andando está em Idle
+        if(input.performed)
+            OnStateChanged?.Invoke(PlayerState.Walking);
+        else if(input.canceled) 
+            OnStateChanged?.Invoke(PlayerState.Idle);
     }
 
     private void Jump(InputAction.CallbackContext input)
     {
         if(!IsGrounded)
         return;
-        currentPlayerState = PlayerState.Jumping;
+        OnStateChanged?.Invoke(PlayerState.Jumping);
+        IsGrounded = false; 
+        
     }
-    
-    
+
+    private void CheckGround(bool hasHitGround) //achei estranho ter que criar uma função só para isso, está correto?
+    {
+        IsGrounded = hasHitGround;
+        OnStateChanged?.Invoke(IsGrounded ? PlayerState.Idle : PlayerState.Jumping); //esta me causando estranheza não ter um estado para "caindo", não sei se isso faz sentido.
+    }
+        
+
+    private void HandleStateChange(PlayerState state)
+    {
+        switch (state)
+        {
+            case PlayerState.Idle: 
+                CurrentPlayerState = PlayerState.Idle;
+                break;
+            case PlayerState.Walking:
+                CurrentPlayerState = PlayerState.Walking;
+                break;
+            case PlayerState.Attacking:
+                CurrentPlayerState = PlayerState.Attacking;
+                break;
+            case PlayerState.Jumping:
+                CurrentPlayerState = PlayerState.Jumping;
+                break;
+            case PlayerState.Dead:
+                CurrentPlayerState = PlayerState.Dead;
+                break;
+            default:
+                CurrentPlayerState = PlayerState.Spawning;
+                break;
+                
+        }
+    }
+
+
+    private void OnBecameInvisible()
+    {
+        transform.position = new Vector3(-6.1f, 2.5f, 0f);
+    }
 }
 
 
