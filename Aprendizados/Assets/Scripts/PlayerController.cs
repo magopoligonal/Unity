@@ -56,7 +56,7 @@ public class PlayerController : MonoBehaviour
 
         //PlayerMovement
         Player_Movement.OnFalling += HandleStateChange;
-        //Player_Movement.OnIdle += HandleStateChange;
+        Player_Movement.OnIdle += HandleStateChange;
     }
 
     void OnDisable()
@@ -71,6 +71,7 @@ public class PlayerController : MonoBehaviour
         
         //PlayerMovement
         Player_Movement.OnFalling -= HandleStateChange;
+        Player_Movement.OnIdle -= HandleStateChange;
         
         
         //PlayerCollision
@@ -90,7 +91,10 @@ public class PlayerController : MonoBehaviour
 
     private void Run(InputAction.CallbackContext input)
     {
-        OnStateChanged?.Invoke(PlayerState.Running);
+        OnStateChanged?.Invoke(PlayerState.Running); 
+        /*revisando o código e testando in-game percebi que essa linha talvez entre no mesmo caso de não ser responsabilidade dela resolver o estado.
+        * No momento ele não mantem running caso eu caia em um plano, mas caso seja em uma rampa, ele mantem o running e não troca pra Idle no Player_Movement. Por enquanto vou manter pq imagino que seja engraçado com a animacao de corrida.
+         */
     }
 
     private void Walk(InputAction.CallbackContext input)
@@ -98,8 +102,7 @@ public class PlayerController : MonoBehaviour
         //se não está andando está em Idle
         if(input.performed)
             OnStateChanged?.Invoke(PlayerState.Walking);
-        else if(input.canceled) 
-            OnStateChanged?.Invoke(PlayerState.Idle);
+        
     }
 
     private void Jump(InputAction.CallbackContext input)

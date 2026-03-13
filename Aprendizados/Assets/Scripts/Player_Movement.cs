@@ -25,6 +25,7 @@ public class Player_Movement : MonoBehaviour
 
     //Events
     public static event Action<PlayerController.PlayerState> OnFalling;
+    public static event Action<PlayerController.PlayerState> OnIdle;
 //metodos
         //system
 
@@ -65,6 +66,7 @@ public class Player_Movement : MonoBehaviour
         
         _rb.linearVelocity = new Vector2(_horizontalMovement * _runningSpeed, _rb.linearVelocity.y);
         CheckFalling();
+        CheckIdle();
         
 
     }
@@ -136,6 +138,12 @@ public class Player_Movement : MonoBehaviour
         {
             _isFalling = false;
         }
+    }
+
+    private void CheckIdle() //será que daria pra fazer uma corrotina aqui e esperar um tempo para ativar?
+    {
+        if (_isGrounded && _rb.linearVelocity == Vector2.zero)
+            OnIdle?.Invoke(PlayerController.PlayerState.Idle);
     }
     
 }
