@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR;
 
+
 public class PlayerController : MonoBehaviour
 {
     //enums
@@ -14,6 +15,7 @@ public class PlayerController : MonoBehaviour
         Running,
         Attacking,
         Jumping,
+        Falling,
         Dead
     }
 //variables 
@@ -40,7 +42,6 @@ public class PlayerController : MonoBehaviour
     //system
     void OnEnable()
     {
-        //placeholder para OnIdle --> imagino que esse evento seja disparado pelo Player_Movement quando a velocidade for 0f ou algo assim
         //placeholder para OnDeath
         InputManager.OnWalking += Walk;
         InputManager.OnRunning += Run;
@@ -54,8 +55,8 @@ public class PlayerController : MonoBehaviour
         PlayerCollision.OnReachingGround += CheckGround;
 
         //PlayerMovement
-        
-        
+        Player_Movement.OnFalling += HandleStateChange;
+        //Player_Movement.OnIdle += HandleStateChange;
     }
 
     void OnDisable()
@@ -66,9 +67,10 @@ public class PlayerController : MonoBehaviour
         InputManager.OnAttack -= Attack;
         
         //PlayerController
-        OnStateChanged -= OnStateChanged;
+        OnStateChanged -= HandleStateChange;
         
         //PlayerMovement
+        Player_Movement.OnFalling -= HandleStateChange;
         
         
         //PlayerCollision
@@ -81,9 +83,6 @@ public class PlayerController : MonoBehaviour
         //TO-DO porquê ainda não sei
         //ativar animação de ataque
         //tocar som
-        if(CurrentPlayerState == PlayerState.Jumping) //Coloquei apenas para testar a lógica
-        return;
-
         OnStateChanged?.Invoke(PlayerState.Attacking);
         //imagino que não seja aqui que vejamos se o dano foi aplicado, ele apenas ataca né?
         //eu imagino uma interação de ataque onde a personagem esteja pulando como no Grand Chase, mas caso contrario eu poderia verificar se o currentPlayerState é Jumping para impedir né ? 
@@ -105,17 +104,16 @@ public class PlayerController : MonoBehaviour
 
     private void Jump(InputAction.CallbackContext input)
     {
-        if(!IsGrounded)
-        return;
-        OnStateChanged?.Invoke(PlayerState.Jumping);
+        if(!IsGrounded) return;
+        
         IsGrounded = false; 
+        OnStateChanged?.Invoke(PlayerState.Jumping);
         
     }
 
-    private void CheckGround(bool hasHitGround) //achei estranho ter que criar uma função só para isso, está correto?
+    private void CheckGround(bool hasHitGround)
     {
         IsGrounded = hasHitGround;
-        OnStateChanged?.Invoke(IsGrounded ? PlayerState.Idle : PlayerState.Jumping); //esta me causando estranheza não ter um estado para "caindo", não sei se isso faz sentido.
     }
         
 
@@ -129,11 +127,17 @@ public class PlayerController : MonoBehaviour
             case PlayerState.Walking:
                 CurrentPlayerState = PlayerState.Walking;
                 break;
-            case PlayerState.Attacking:
-                CurrentPlayerState = PlayerState.Attacking;
+            case PlayerState.Running:
+                CurrentPlayerState = PlayerState.Running;
                 break;
             case PlayerState.Jumping:
                 CurrentPlayerState = PlayerState.Jumping;
+                break;
+            case PlayerState.Falling:
+                CurrentPlayerState = PlayerState.Falling;
+                break;
+            case PlayerState.Attacking:
+                CurrentPlayerState = PlayerState.Attacking;
                 break;
             case PlayerState.Dead:
                 CurrentPlayerState = PlayerState.Dead;
@@ -145,11 +149,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
-    private void OnBecameInvisible()
-    {
-        transform.position = new Vector3(-6.1f, 2.5f, 0f);
-    }
 }
 
 

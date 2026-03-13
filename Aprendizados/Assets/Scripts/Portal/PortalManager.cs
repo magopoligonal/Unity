@@ -23,7 +23,7 @@ public class PortalManager : MonoBehaviour
         player.position = _colliderPositions[1].position;
         else if(portal.transform.position == _colliderPositions[1].position) //Portal R_UP
             player.position = _colliderPositions[0].position;
-        else
+        else if(portal.transform.position == _colliderPositions[2].position)
         {
             player.position = _ResetPosition.position;
         }

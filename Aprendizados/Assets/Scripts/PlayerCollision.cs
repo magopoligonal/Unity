@@ -6,10 +6,8 @@ public class PlayerCollision : MonoBehaviour
     [SerializeField] private LayerMask _groundLayer; //vai ser como uma flag para sabermos se estamos ou não no chão
     [SerializeField] private Transform[] _positionCollider; //aqui são os pontos dos raios
     [SerializeField] private float _rayDistance; //e aqui a distância que o raio pode chegar (só para ficar mais fácil de customizar no inspetor)
-   // [SerializeField] private CircleCollider2D _feetCollider; //especificar o collider ajuda a unity a saber qual pegar? Imaginei fazer uma hierarquia onde temos o player e um objeto vazio dentro com o collider, mas fiquei na dúvida se GetComponent<>() pegaria do pai ou do filho
-   // [SerializeField] private Vector2 _rayDirection;
-   [SerializeField] private PlayerController _playerController;
-   private bool _wasGrounded;
+    [SerializeField] private PlayerController _playerController;
+    private bool _wasGrounded;
    
    //events
    public static event Action<bool> OnReachingGround; //avisa para quem estiver ouvindo que o player tocou o chão
@@ -17,8 +15,7 @@ public class PlayerCollision : MonoBehaviour
 
     void FixedUpdate()
     {
-        bool isGrounded= Physics2D.CircleCast(_positionCollider[1].position, _rayDistance, Vector2.zero, _rayDistance, _groundLayer).collider; //retorna se colidiu
-        
+        bool isGrounded = Physics2D.OverlapCircle(_positionCollider[0].position, _rayDistance, _groundLayer);
         if (isGrounded != _wasGrounded)
         {
             OnReachingGround?.Invoke(isGrounded);
@@ -27,7 +24,7 @@ public class PlayerCollision : MonoBehaviour
         
     }
 
-
+    
     void OnDrawGizmos() //funcao que serve para desenhar (não necessariamente está ligada com o OverlapCircle ou algo do tipo)
     {
         Gizmos.color = Color.aliceBlue;
