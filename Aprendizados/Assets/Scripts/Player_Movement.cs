@@ -14,6 +14,7 @@ public class Player_Movement : MonoBehaviour
     [SerializeField] private float _verticalMovement = 0f;
     [SerializeField] private float _jumpingModifier = 0f;
     private bool _isFalling;
+    private bool _isIdle;
     
     [Header("States")] 
     private bool IsFacingRight {get; set;}
@@ -26,6 +27,7 @@ public class Player_Movement : MonoBehaviour
     //Events
     public static event Action<PlayerController.PlayerState> OnFalling;
     public static event Action<PlayerController.PlayerState> OnIdle;
+    public static  event Action<bool> HasSideChanged;
 //metodos
         //system
 
@@ -86,7 +88,7 @@ public class Player_Movement : MonoBehaviour
         IsFacingRight = lastSide;
             
         //avisa para quem quiser ouvir que o lado mudou
-        PlayerController.hasSideChanged?.Invoke(IsFacingRight);
+        HasSideChanged?.Invoke(IsFacingRight);
 
         _horizontalMovement = input.ReadValue<Vector2>().x * _speed; //aparentemente não precisa do Time.deltaTime nem Time.fixedDeltaTime
          Debug.Log("Está andando!");
@@ -143,7 +145,18 @@ public class Player_Movement : MonoBehaviour
     private void CheckIdle() //será que daria pra fazer uma corrotina aqui e esperar um tempo para ativar?
     {
         if (_isGrounded && _rb.linearVelocity == Vector2.zero)
-            OnIdle?.Invoke(PlayerController.PlayerState.Idle);
+        {
+            if (!_isIdle)
+            {
+                _isIdle = true;
+                OnIdle?.Invoke(PlayerController.PlayerState.Idle);
+            }
+        }
+        else
+        {
+            _isIdle = false;
+        }
+            
     }
     
 }

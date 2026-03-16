@@ -34,8 +34,8 @@ public class PlayerController : MonoBehaviour
     }
 
     //Events
-    public static  Action<PlayerState> OnStateChanged;
-    public static  Action<bool> hasSideChanged;
+    public static  event Action<PlayerState> OnStateChanged;
+    
     
 
 //methods

@@ -5,14 +5,12 @@ using UnityEngine.InputSystem;
 public class PlayerAnimator : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
-    [SerializeField] private SpriteRenderer _spriteRenderer;
     //Events
     
 
     void Awake()
     {
         _animator = GetComponent<Animator>();
-        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void OnEnable()
@@ -27,7 +25,9 @@ public class PlayerAnimator : MonoBehaviour
 
         //SpriteRenderer
         
-        PlayerController.hasSideChanged += FlipSprite;
+        Player_Movement.HasSideChanged += FlipSprite;
+        
+        
 
     }
     void OnDisable()
@@ -39,7 +39,7 @@ public class PlayerAnimator : MonoBehaviour
         InputManager.OnAttack -= Attack;
         //SpriteRenderer
         
-        PlayerController.hasSideChanged -= FlipSprite;
+        Player_Movement.HasSideChanged -= FlipSprite;
     }
 
     /*  Ok nesse estagio de programar os metodos eu me peguei pensando: ter o controle de .started .performed e .canceled pode ser util para as animacoes?
@@ -71,7 +71,7 @@ public class PlayerAnimator : MonoBehaviour
     private void Attack(InputAction.CallbackContext input)
     {
         if(input.performed)
-        _animator.SetTrigger(StringsAnimation.Attack);
+            _animator.SetTrigger(StringsAnimation.Attack);
     }
 
 
@@ -79,15 +79,15 @@ public class PlayerAnimator : MonoBehaviour
     {
         Vector3 scale = transform.localScale;
         if(isRightSide)
-        scale.x = 1f;
+            scale.x = 1f;
         else
-        scale.x = -1f;
+            scale.x = -1f;
         transform.localScale = scale;
     }
 
 
 }
 
-/**
+/*
 * Classe responsavel por ouvir eventos e desencadear animações
 */
