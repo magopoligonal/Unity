@@ -9,14 +9,17 @@ public class PlayerController : MonoBehaviour
     //enums
     public enum PlayerState
     {
-        Spawning, 
-        Idle,
-        Walking,
-        Running,
-        Attacking,
-        Jumping,
-        Falling,
-        Dead
+        //0-1 Instantaneos
+        Spawning = 0, 
+        Dead = 1,
+        //2-6 Movimentacao
+        Idle = 2,
+        Walking = 3,
+        Running = 4,
+        Jumping = 5,
+        Falling = 6,
+        //7-x Combate
+        Attacking = 7,
     }
 //variables 
     //fields
@@ -55,8 +58,11 @@ public class PlayerController : MonoBehaviour
         PlayerCollision.OnReachingGround += CheckGround;
 
         //PlayerMovement
-        Player_Movement.OnFalling += HandleStateChange;
-        Player_Movement.OnIdle += HandleStateChange;
+        PlayerMovement.OnFalling += CheckFalling;
+        PlayerMovement.OnIdle += CheckIdle;
+        
+        //Player Animation
+        PlayerAnimation2.OnAttackFinished += CheckAttackFinished;
     }
 
     void OnDisable()
@@ -70,39 +76,34 @@ public class PlayerController : MonoBehaviour
         OnStateChanged -= HandleStateChange;
         
         //PlayerMovement
-        Player_Movement.OnFalling -= HandleStateChange;
-        Player_Movement.OnIdle -= HandleStateChange;
+        PlayerMovement.OnFalling -= CheckFalling;
+        PlayerMovement.OnIdle -= CheckIdle;
         
         
         //PlayerCollision
         PlayerCollision.OnReachingGround -= CheckGround;
+        
+        //PlayerAnimation2 
+        PlayerAnimation2.OnAttackFinished -= CheckAttackFinished;
     }
 
     //playerController
     private void Attack(InputAction.CallbackContext input) //esse parametro está vindo lá do InputManager
     {
-        //TO-DO porquê ainda não sei
-        //ativar animação de ataque
-        //tocar som
-        OnStateChanged?.Invoke(PlayerState.Attacking);
-        //imagino que não seja aqui que vejamos se o dano foi aplicado, ele apenas ataca né?
-        //eu imagino uma interação de ataque onde a personagem esteja pulando como no Grand Chase, mas caso contrario eu poderia verificar se o currentPlayerState é Jumping para impedir né ? 
+        if(input.performed)
+            OnStateChanged?.Invoke(PlayerState.Attacking);
     }
 
     private void Run(InputAction.CallbackContext input)
     {
-        OnStateChanged?.Invoke(PlayerState.Running); 
-        /*revisando o código e testando in-game percebi que essa linha talvez entre no mesmo caso de não ser responsabilidade dela resolver o estado.
-        * No momento ele não mantem running caso eu caia em um plano, mas caso seja em uma rampa, ele mantem o running e não troca pra Idle no Player_Movement. Por enquanto vou manter pq imagino que seja engraçado com a animacao de corrida.
-         */
+        if(input.performed)
+            OnStateChanged?.Invoke(PlayerState.Running); 
     }
 
     private void Walk(InputAction.CallbackContext input)
     {
-        //se não está andando está em Idle
         if(input.performed)
             OnStateChanged?.Invoke(PlayerState.Walking);
-        
     }
 
     private void Jump(InputAction.CallbackContext input)
@@ -118,38 +119,26 @@ public class PlayerController : MonoBehaviour
     {
         IsGrounded = hasHitGround;
     }
-        
+
+    private void CheckFalling()
+    {
+        OnStateChanged?.Invoke(PlayerState.Falling);
+    }
+
+    private void CheckIdle()
+    {
+        OnStateChanged?.Invoke(PlayerState.Idle);
+    }
+
+    private void CheckAttackFinished()
+    {
+        OnStateChanged?.Invoke(PlayerState.Idle);
+    }
+    
 
     private void HandleStateChange(PlayerState state)
     {
-        switch (state)
-        {
-            case PlayerState.Idle: 
-                CurrentPlayerState = PlayerState.Idle;
-                break;
-            case PlayerState.Walking:
-                CurrentPlayerState = PlayerState.Walking;
-                break;
-            case PlayerState.Running:
-                CurrentPlayerState = PlayerState.Running;
-                break;
-            case PlayerState.Jumping:
-                CurrentPlayerState = PlayerState.Jumping;
-                break;
-            case PlayerState.Falling:
-                CurrentPlayerState = PlayerState.Falling;
-                break;
-            case PlayerState.Attacking:
-                CurrentPlayerState = PlayerState.Attacking;
-                break;
-            case PlayerState.Dead:
-                CurrentPlayerState = PlayerState.Dead;
-                break;
-            default:
-                CurrentPlayerState = PlayerState.Spawning;
-                break;
-                
-        }
+        CurrentPlayerState = state;
     }
 
 }

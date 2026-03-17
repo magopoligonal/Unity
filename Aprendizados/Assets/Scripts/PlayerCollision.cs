@@ -6,7 +6,6 @@ public class PlayerCollision : MonoBehaviour
     [SerializeField] private LayerMask _groundLayer; //vai ser como uma flag para sabermos se estamos ou não no chão
     [SerializeField] private Transform[] _positionCollider; //aqui são os pontos dos raios
     [SerializeField] private float _rayDistance; //e aqui a distância que o raio pode chegar (só para ficar mais fácil de customizar no inspetor)
-    [SerializeField] private PlayerController _playerController;
     private bool _wasGrounded;
    
    //events
@@ -15,12 +14,7 @@ public class PlayerCollision : MonoBehaviour
 
     void FixedUpdate()
     {
-        bool isGrounded = Physics2D.OverlapCircle(_positionCollider[0].position, _rayDistance, _groundLayer);
-        if (isGrounded != _wasGrounded)
-        {
-            OnReachingGround?.Invoke(isGrounded);
-            _wasGrounded = isGrounded;
-        }
+        CheckGround();
         
     }
 
@@ -29,6 +23,16 @@ public class PlayerCollision : MonoBehaviour
     {
         Gizmos.color = Color.aliceBlue;
         Gizmos.DrawWireSphere(_positionCollider[1].position, _rayDistance);
+    }
+
+    private void CheckGround()
+    {
+        bool isGrounded = Physics2D.OverlapCircle(_positionCollider[0].position, _rayDistance, _groundLayer);
+        if (isGrounded != _wasGrounded)
+        {
+            OnReachingGround?.Invoke(isGrounded);
+            _wasGrounded = isGrounded;
+        }
     }
     
     

@@ -2633,9 +2633,9 @@ GameObject:
   - component: {fileID: 1654460678}
   - component: {fileID: 1654460681}
   - component: {fileID: 1654460682}
-  - component: {fileID: 1654460685}
   - component: {fileID: 1654460684}
   - component: {fileID: 1654460683}
+  - component: {fileID: 1654460686}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -2653,7 +2653,7 @@ Animator:
   m_GameObject: {fileID: 1654460677}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 82b50f0a0ee66696abf0ce30192f6d03, type: 2}
+  m_Controller: {fileID: 9100000, guid: 5a818562c249a4f7ba6f3896e266f4b9, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -2759,6 +2759,7 @@ MonoBehaviour:
   _horizontalMovement: 0
   _verticalMovement: 0
   _jumpingModifier: 0
+  _isGrounded: 0
   _rb: {fileID: 0}
 --- !u!114 &1654460682
 MonoBehaviour:
@@ -2837,7 +2838,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &1654460685
+--- !u!114 &1654460686
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2846,11 +2847,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1654460677}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2cf200b7cd770dae81ffaabd8905c1a, type: 3}
+  m_Script: {fileID: 11500000, guid: 2d2ca4a996cda402dbc0a4ebc3139b13, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimator
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation2
   _animator: {fileID: 0}
-  _spriteRenderer: {fileID: 0}
 --- !u!1 &1771338469
 GameObject:
   m_ObjectHideFlags: 0

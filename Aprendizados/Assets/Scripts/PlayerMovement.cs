@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Player_Movement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
     //variaveis
@@ -25,8 +25,8 @@ public class Player_Movement : MonoBehaviour
     [SerializeField] private Rigidbody2D _rb;
 
     //Events
-    public static event Action<PlayerController.PlayerState> OnFalling;
-    public static event Action<PlayerController.PlayerState> OnIdle;
+    public static event Action OnFalling;
+    public static event Action OnIdle;
     public static  event Action<bool> HasSideChanged;
 //metodos
         //system
@@ -85,10 +85,11 @@ public class Player_Movement : MonoBehaviour
         else
             lastSide = IsFacingRight;
         
-        IsFacingRight = lastSide;
-            
-        //avisa para quem quiser ouvir que o lado mudou
-        HasSideChanged?.Invoke(IsFacingRight);
+        if (lastSide != IsFacingRight)
+        {
+            IsFacingRight = lastSide;
+            HasSideChanged?.Invoke(IsFacingRight);
+        }
 
         _horizontalMovement = input.ReadValue<Vector2>().x * _speed; //aparentemente não precisa do Time.deltaTime nem Time.fixedDeltaTime
          Debug.Log("Está andando!");
@@ -101,7 +102,7 @@ public class Player_Movement : MonoBehaviour
     private void Run(InputAction.CallbackContext input)
     {
         if(input.performed)
-            _runningSpeed = (1 + _runningModifier);  //é correto usar esse 1 + var ? a ideia veio de como fazemos conta de porcentagem.
+            _runningSpeed = (1 + _runningModifier);  
         else if(input.canceled)
             _runningSpeed = 1f;
         Debug.Log("Está correndo!");
@@ -113,7 +114,6 @@ public class Player_Movement : MonoBehaviour
         {
             _rb.linearVelocityY = 0 + _jumpingModifier; //mantendo o 0 pela legibilidade  
             _rb.AddForceY(_jumpingForce, ForceMode2D.Impulse);
-            _verticalMovement = _rb.linearVelocityY; //apenas para checar vou limpa
         }
         
         else { Debug.Log("Já está no ar, não trapaceie!"); }
@@ -123,7 +123,6 @@ public class Player_Movement : MonoBehaviour
     private void GroundCheck(bool hasHitGround)
     {
         _isGrounded = hasHitGround;
-        
     }
 
     private void CheckFalling()
@@ -133,7 +132,7 @@ public class Player_Movement : MonoBehaviour
             if (!_isFalling)
             {
                 _isFalling = true;
-                OnFalling?.Invoke(PlayerController.PlayerState.Falling);
+                OnFalling?.Invoke();
             }
         }
         else
@@ -149,7 +148,7 @@ public class Player_Movement : MonoBehaviour
             if (!_isIdle)
             {
                 _isIdle = true;
-                OnIdle?.Invoke(PlayerController.PlayerState.Idle);
+                OnIdle?.Invoke();
             }
         }
         else

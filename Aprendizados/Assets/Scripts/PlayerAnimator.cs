@@ -6,7 +6,6 @@ public class PlayerAnimator : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
     //Events
-    
 
     void Awake()
     {
@@ -25,7 +24,7 @@ public class PlayerAnimator : MonoBehaviour
 
         //SpriteRenderer
         
-        Player_Movement.HasSideChanged += FlipSprite;
+        PlayerMovement.HasSideChanged += FlipSprite;
         
         
 
@@ -39,7 +38,7 @@ public class PlayerAnimator : MonoBehaviour
         InputManager.OnAttack -= Attack;
         //SpriteRenderer
         
-        Player_Movement.HasSideChanged -= FlipSprite;
+        PlayerMovement.HasSideChanged -= FlipSprite;
     }
 
     /*  Ok nesse estagio de programar os metodos eu me peguei pensando: ter o controle de .started .performed e .canceled pode ser util para as animacoes?
@@ -85,6 +84,7 @@ public class PlayerAnimator : MonoBehaviour
         transform.localScale = scale;
     }
 
+    
 
 }
 
