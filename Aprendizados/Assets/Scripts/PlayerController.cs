@@ -19,7 +19,9 @@ public class PlayerController : MonoBehaviour
         Jumping = 5,
         Falling = 6,
         //7-x Combate
-        Attacking = 7,
+        Attacking01 = 7,
+        Attacking02 = 8,
+        Attacking03 = 9,
     }
 //variables 
     //fields
@@ -90,8 +92,9 @@ public class PlayerController : MonoBehaviour
     //playerController
     private void Attack(InputAction.CallbackContext input) //esse parametro está vindo lá do InputManager
     {
+        Debug.Log("Ataque Performado.");
         if(input.performed)
-            OnStateChanged?.Invoke(PlayerState.Attacking);
+            OnStateChanged?.Invoke(PlayerState.Attacking01);
     }
 
     private void Run(InputAction.CallbackContext input)
@@ -102,6 +105,7 @@ public class PlayerController : MonoBehaviour
 
     private void Walk(InputAction.CallbackContext input)
     {
+        Debug.Log("Andar performado.");
         if(input.performed)
             OnStateChanged?.Invoke(PlayerState.Walking);
     }

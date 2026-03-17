@@ -18,9 +18,10 @@ public class InputManager : MonoBehaviour
 
     public void AttackPressed(InputAction.CallbackContext input)
     {
+        Debug.Log("AttackPressed chamado1111111111");
         if (input.performed)
         {
-            //TODO
+            Debug.Log("Attack performed");
             OnAttack?.Invoke(input);
         }
     }

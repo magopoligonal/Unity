@@ -1645,7 +1645,6 @@ MonoBehaviour:
   - {fileID: 566023053}
   - {fileID: 1529920707}
   _rayDistance: 0.18
-  _playerController: {fileID: 0}
 --- !u!1 &929221259
 GameObject:
   m_ObjectHideFlags: 0
@@ -2760,7 +2759,7 @@ MonoBehaviour:
   _verticalMovement: 0
   _jumpingModifier: 0
   _isGrounded: 0
-  _rb: {fileID: 0}
+  _rb: {fileID: 1654460684}
 --- !u!114 &1654460682
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2773,7 +2772,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cd20ca9b4f6cfaf3973d3f7c91786c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  _currentPlayerState: 1
+  _currentPlayerState: 2
 --- !u!70 &1654460683
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -2850,7 +2849,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d2ca4a996cda402dbc0a4ebc3139b13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation2
-  _animator: {fileID: 0}
+  _animator: {fileID: 1654460678}
 --- !u!1 &1771338469
 GameObject:
   m_ObjectHideFlags: 0
