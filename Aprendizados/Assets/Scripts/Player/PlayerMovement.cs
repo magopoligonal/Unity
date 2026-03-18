@@ -11,7 +11,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField, Range(0.2f,1f)] private float _runningModifier = 0.2f;
     [SerializeField, Range(10,30)] private float _jumpingForce = 10f;
     [SerializeField] private float _horizontalMovement = 0f;
-    [SerializeField] private float _verticalMovement = 0f;
     [SerializeField] private float _jumpingModifier = 0f;
     private bool _isFalling;
     private bool _isIdle;

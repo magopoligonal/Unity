@@ -48,6 +48,7 @@ public class PlayerAnimation2 : MonoBehaviour
     
     public void OnAttackAnimationEnd()
     {
+        Debug.Log("AttackFinished chamado no frame:  " + Time.frameCount);
         OnAttackFinished?.Invoke();
         Debug.Log("AttackFinished foi chamado!");
     }
