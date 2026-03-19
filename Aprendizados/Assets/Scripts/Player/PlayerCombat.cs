@@ -52,3 +52,7 @@ public class PlayerCombat : MonoBehaviour
         }
     }
 }
+
+/*
+ * Obs: Percebi um pequeno bug que não altera em nada o funcionamento do jogo(ao menos nos meus teste), mas o Gizmo fica desenhado caso eu ataque e rapidamente pule, não dá dano, mas o circle fica lá até eu clicar no ataque novamente e somente assim sai no fim da animação.  
+ */
