@@ -92,8 +92,6 @@ public class PlayerController : MonoBehaviour
     //playerController
     private void Attack(InputAction.CallbackContext input) //esse parametro está vindo lá do InputManager
     {
-        Debug.Log("Attack invocado no frame: " + Time.frameCount);
-
         if(input.performed)
             OnStateChanged?.Invoke(PlayerState.Attacking01);
     }
@@ -106,7 +104,6 @@ public class PlayerController : MonoBehaviour
 
     private void Walk(InputAction.CallbackContext input)
     {
-        Debug.Log("Andar performado.");
         if(input.performed)
             OnStateChanged?.Invoke(PlayerState.Walking);
     }
