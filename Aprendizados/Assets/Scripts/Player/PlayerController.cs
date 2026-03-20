@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
 //variables 
     //fields
     [SerializeField] private PlayerState _currentPlayerState = PlayerState.Idle;
-    
+    [SerializeField] private bool _canCombo;
     //Properties
     public bool IsGrounded {get; private set;}
     public PlayerState CurrentPlayerState
@@ -47,7 +47,7 @@ public class PlayerController : MonoBehaviour
     //system
     void OnEnable()
     {
-        //placeholder para OnDeath
+        //InputManager
         InputManager.OnWalking += Walk;
         InputManager.OnRunning += Run;
         InputManager.OnJump += Jump;
@@ -63,12 +63,16 @@ public class PlayerController : MonoBehaviour
         PlayerMovement.OnFalling += CheckFalling;
         PlayerMovement.OnIdle += CheckIdle;
         
-        //Player Animation
-        PlayerAnimation2.OnAttackFinished += CheckAttackFinished;
+        //Player Animator
+        PlayerAnimator.OnAttackFinished += CheckAttackFinished;
+        
+        //Player Combat
+        PlayerCombat.OnComboWindowOpen += CheckComboWindow;
     }
 
     void OnDisable()
     {
+        //InputManager
         InputManager.OnWalking -= Walk;
         InputManager.OnRunning -= Run;
         InputManager.OnJump -= Jump;
@@ -85,15 +89,25 @@ public class PlayerController : MonoBehaviour
         //PlayerCollision
         PlayerCollision.OnReachingGround -= CheckGround;
         
-        //PlayerAnimation2 
-        PlayerAnimation2.OnAttackFinished -= CheckAttackFinished;
+        //PlayerAnimator
+        PlayerAnimator.OnAttackFinished -= CheckAttackFinished;
+        
+        //PlayerCombat
+        PlayerCombat.OnComboWindowOpen -= CheckComboWindow;
     }
 
     //playerController
     private void Attack(InputAction.CallbackContext input) //esse parametro está vindo lá do InputManager
     {
         if(input.performed)
-            OnStateChanged?.Invoke(PlayerState.Attacking01);
+            if (_canCombo)
+            {
+                OnStateChanged?.Invoke(PlayerState.Attacking02);
+            }
+            else
+            {
+                OnStateChanged?.Invoke(PlayerState.Attacking01);
+            }
     }
 
     private void Run(InputAction.CallbackContext input)
@@ -136,6 +150,12 @@ public class PlayerController : MonoBehaviour
     {
         OnStateChanged?.Invoke(PlayerState.Idle);
     }
+
+    private void CheckComboWindow(bool isWindowOpen)
+    {
+        _canCombo = isWindowOpen;
+    }
+    
     
 
     private void HandleStateChange(PlayerState state)

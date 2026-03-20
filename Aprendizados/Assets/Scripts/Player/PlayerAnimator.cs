@@ -1,93 +1,61 @@
-using System;
-using UnityEngine;
-using UnityEngine.InputSystem;
 
+using UnityEngine;
+using System;
 public class PlayerAnimator : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
-    //Events
 
-    void Awake()
+    //events 
+    public static event Action OnAttackFinished;
+
+    private void OnEnable()
+    {
+        //Player Controller
+        PlayerController.OnStateChanged += HandleAnimation;
+        
+        //Player Movement
+        PlayerMovement.HasSideChanged += FlipSprite;
+    }
+
+    private void OnDisable()
+    {
+        //Player Controller
+        PlayerController.OnStateChanged -= HandleAnimation;
+        
+        //Player Movement 
+        PlayerMovement.HasSideChanged -= FlipSprite;
+    }
+    
+    private void Awake()
     {
         _animator = GetComponent<Animator>();
     }
 
-    void OnEnable()
+    private void HandleAnimation(PlayerController.PlayerState state)
     {
-        //Animator
-        InputManager.OnWalking += Walk;
-        InputManager.OnRunning += Run;
-        InputManager.OnJump += Jump;
-        InputManager.OnAttack += Attack;
-        //falta pensar e criar um classe que disparara OnDeath e OnSpawning
-        //tambem falta pensar uma forma de voltar para o Idle ou ele volta sozinho por causa do animator?
-
-        //SpriteRenderer
-        
-        PlayerMovement.HasSideChanged += FlipSprite;
-        
-        
-
-    }
-    void OnDisable()
-    {
-        //Animator
-        InputManager.OnWalking -= Walk;
-        InputManager.OnRunning -= Run;
-        InputManager.OnJump -= Jump;
-        InputManager.OnAttack -= Attack;
-        //SpriteRenderer
-        
-        PlayerMovement.HasSideChanged -= FlipSprite;
+        _animator.SetInteger(StringsAnimation.CurrentState, (int)state);
     }
 
-    /*  Ok nesse estagio de programar os metodos eu me peguei pensando: ter o controle de .started .performed e .canceled pode ser util para as animacoes?
-     *  Ou isso só vai atrapalhar?
-     */
-    private void Walk(InputAction.CallbackContext input)
-    {
-        //TODO   
-        if(input.started)
-        {
-            _animator.SetBool(StringsAnimation.isWalking, true);
-            //aqui eu teria que avisar o Player Controller de alguma forma?
-        }else if (input.canceled)
-        {
-            _animator.SetBool(StringsAnimation.isWalking, false);
-        }
-
-        //fiquei pensando se daria para fazer um switch com todos os estados que checaria o PlayerState de forma a reduzir o numero de metodos
-    }
-
-    private void Run(InputAction.CallbackContext input)
-    {
-        //Não tem sprites para a corrida.
-    }
-    private void Jump(InputAction.CallbackContext input)
-    {
-        //Não tem sprites para o pulo, então vou tentar fazer depois.
-    }
-    private void Attack(InputAction.CallbackContext input)
-    {
-        if(input.performed)
-            _animator.SetTrigger(StringsAnimation.Attack);
-    }
-
-
-    private void FlipSprite(bool isRightSide) 
+    /// <summary>
+    /// Inverte o objeto de forma segura, dessa forma não apenas a Sprite é invertida(função principal desse método)
+    /// como também o objeto por completo, assim colisores, marcadores de posição etc seguem a lógica visual 
+    /// </summary>
+    /// <param name="isRightSide"></param>
+    private void FlipSprite(bool isRightSide)
     {
         Vector3 scale = transform.localScale;
         if(isRightSide)
-            scale.x = 1f;
-        else
-            scale.x = -1f;
+            scale.x = 1;
+        else 
+            scale.x = -1;
         transform.localScale = scale;
     }
-
     
-
+    /// <summary>
+    /// Função utilizada para definir o fim da animação no animation event na aba animation.
+    /// </summary>
+    public void OnAttackAnimationEnd()
+    {
+        OnAttackFinished?.Invoke();
+    }
 }
-
-/*
-* Classe responsavel por ouvir eventos e desencadear animações
-*/

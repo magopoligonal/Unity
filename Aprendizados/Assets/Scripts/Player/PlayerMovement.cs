@@ -43,6 +43,9 @@ public class PlayerMovement : MonoBehaviour
         
         //PlayerCollision
         PlayerCollision.OnReachingGround += GroundCheck;
+        
+        //PlayerCombat
+        PlayerCombat.OnComboWindowOpen += CheckStrongAttack;
 
     }
 
@@ -55,21 +58,15 @@ public class PlayerMovement : MonoBehaviour
         //PlayerCollision
         PlayerCollision.OnReachingGround -= GroundCheck;
        
+        //PlayerCombat
+        PlayerCombat.OnComboWindowOpen -= CheckStrongAttack;
     }
 
     void FixedUpdate()
     {
-        /*  obs 1: talvez verificar se o movimenta está estagnado durante alguns segundo e ativar o Idle caso o estado não seja nem Spawning nem Death ?
-        ainda não sei como faria isso
-            obs 2: em um ataque comum não se espera que o player ande, então talvez zerar o movimento quando currentPlayerState mudar
-        */
-      
-        
         _rb.linearVelocity = new Vector2(_horizontalMovement * _runningSpeed, _rb.linearVelocity.y);
         CheckFalling();
         CheckIdle();
-        
-
     }
 
     
@@ -155,6 +152,12 @@ public class PlayerMovement : MonoBehaviour
             _isIdle = false;
         }
             
+    }
+
+    private void CheckStrongAttack(bool isInStrongAttack)
+    {
+        if (isInStrongAttack)
+            _rb.AddForceX(-(_horizontalMovement*0.8f), ForceMode2D.Impulse);
     }
     
 }
