@@ -8,10 +8,10 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private Transform _attackPoint;
     [SerializeField] private float _attackRadius;
     [SerializeField] private LayerMask _enemyLayer;
-    
+    [SerializeField, Range(0.2f, 1f)] private float timer = 0.2f;
     private bool _hitboxActive;
     private bool _comboWindowOpen = false;
-    //private int _currentCombo;
+    private int _currentCombo;
     private Coroutine _comboWindowRoutine; //armazena a referencia que o StartCoroutine vai gerar, dessa forma temos como parar manualmente o coroutine
     
     
@@ -26,12 +26,14 @@ public class PlayerCombat : MonoBehaviour
     {
         //PlayerController
         PlayerController.OnStateChanged += HandleStateChange;
+        PlayerController.OnAttackPressed += TryCombo;
     }
 
     private void OnDisable()
     {
         //PlayerController
         PlayerController.OnStateChanged -= HandleStateChange;
+        PlayerController.OnAttackPressed -= TryCombo;
     }
      
     
@@ -65,23 +67,24 @@ public class PlayerCombat : MonoBehaviour
     //combo mechanics
     private void OpenComboWindow() //vai ser chamado no animation event
     {
+        
         _comboWindowOpen = true;
         OnComboWindowOpen?.Invoke(_comboWindowOpen);
-        _comboWindowRoutine = StartCoroutine(ComboTimeOut(0.2f));
-        Debug.Log("Rotina Iniciada");
+        _comboWindowRoutine = StartCoroutine(ComboTimeOut(timer));
+        Debug.Log($"Rotina Iniciada, combo atual: {_currentCombo}");
     }
     
-    private IEnumerator ComboTimeOut(float frameAmount)
+    private IEnumerator ComboTimeOut(float windowOpenTimerInSeconds)
     {
-        /*
-        for (int i = 0; i < frameAmount; i++) //pulará o número determinado de frames dependendo da animação
-        {
-            yield return null; //aguarda exatamente um frame
-        }*/
-        yield return new WaitForSeconds(frameAmount);
+        int comboAtStart = _currentCombo;
+        //if (comboAtStart == 3)
+          //  windowOpenTimerInSeconds += 1f;
+        yield return new WaitForSeconds(windowOpenTimerInSeconds);
         _comboWindowOpen = false;
         OnComboWindowOpen?.Invoke(_comboWindowOpen);
-        Debug.Log("Combo Window Closed");
+        Debug.Log($"Combo Window Closed, , combo atual: {_currentCombo}");
+        if(_currentCombo == comboAtStart)
+            PlayerController.ChangeState(PlayerController.PlayerState.Idle); // <-- dessa forma não precisamos do OnAttackAnimationEnd para checar se acabou a animação
     }
     
     
@@ -93,23 +96,46 @@ public class PlayerCombat : MonoBehaviour
     /// <param name="state"></param>
     private void HandleStateChange(PlayerController.PlayerState state)
     {
-        //será que eu poderia ter um dictionary para armazenar o valor de isAttacking e o state atual? ou não faz sentido nenhum (não sei usar bem os dictionaries)
         //TODO - Adicionar o atk especial nessa verificação
         bool isAttacking = state == PlayerController.PlayerState.Attacking01 || state == PlayerController.PlayerState.Attacking02  || state == PlayerController.PlayerState.Attacking03;
-        if (!isAttacking)
+        if (!isAttacking) //se não está atacando, reseta todas as propriedades do ataque.
         {
             _hitboxActive = false;
-            //cancela tambem a coroutine -- dúvida: precisa dos dois ou só stopcoroutine já basta?
+            
             if (_comboWindowRoutine != null) //estava dando erro sem verificar então a partir de agora vou sempre verificar.
             {
                 StopCoroutine(_comboWindowRoutine);
                 _comboWindowRoutine = null; 
                 _comboWindowOpen = false;
                 OnComboWindowOpen?.Invoke(_comboWindowOpen);
+                _currentCombo = 0;
             }
         }
     }
-    
+
+    private void TryCombo()
+    {
+        switch (_currentCombo)
+        {
+            case 0:
+                _currentCombo = 1;
+                timer = 0.2f;
+                PlayerController.ChangeState(PlayerController.PlayerState.Attacking01);
+                break;
+            case 1:
+                if (!_comboWindowOpen) return;
+                _currentCombo = 2;
+                PlayerController.ChangeState(PlayerController.PlayerState.Attacking02);
+                break;
+            case 2:
+                if(!_comboWindowOpen) return;
+                _currentCombo = 3;
+                timer = 1.2f;
+                PlayerController.ChangeState(PlayerController.PlayerState.Attacking03);
+                break;
+        }
+        //Como volta para zero sem ser parando de atacar? ou não precisa?
+    }
     
     
     

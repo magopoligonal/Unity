@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
 //variables 
     //fields
     [SerializeField] private PlayerState _currentPlayerState = PlayerState.Idle;
-    [SerializeField] private bool _canCombo;
+    
     //Properties
     public bool IsGrounded {get; private set;}
     public PlayerState CurrentPlayerState
@@ -39,7 +39,8 @@ public class PlayerController : MonoBehaviour
     }
 
     //Events
-    public static  event Action<PlayerState> OnStateChanged;
+    public static event  Action<PlayerState> OnStateChanged;
+    public static event Action OnAttackPressed;
     
     
 
@@ -67,7 +68,7 @@ public class PlayerController : MonoBehaviour
         PlayerAnimator.OnAttackFinished += CheckAttackFinished;
         
         //Player Combat
-        PlayerCombat.OnComboWindowOpen += CheckComboWindow;
+        
     }
 
     void OnDisable()
@@ -93,21 +94,18 @@ public class PlayerController : MonoBehaviour
         PlayerAnimator.OnAttackFinished -= CheckAttackFinished;
         
         //PlayerCombat
-        PlayerCombat.OnComboWindowOpen -= CheckComboWindow;
+        
     }
 
     //playerController
     private void Attack(InputAction.CallbackContext input) //esse parametro está vindo lá do InputManager
     {
-        if(input.performed)
-            if (_canCombo)
-            {
-                OnStateChanged?.Invoke(PlayerState.Attacking02);
-            }
-            else
-            {
-                OnStateChanged?.Invoke(PlayerState.Attacking01);
-            }
+        if (input.performed)
+        {
+            OnAttackPressed?.Invoke();
+            Debug.Log($"PLAYER CONTROLLER: Ataque pressionado");
+        }
+        
     }
 
     private void Run(InputAction.CallbackContext input)
@@ -151,9 +149,9 @@ public class PlayerController : MonoBehaviour
         OnStateChanged?.Invoke(PlayerState.Idle);
     }
 
-    private void CheckComboWindow(bool isWindowOpen)
+    public static void ChangeState(PlayerState newState)
     {
-        _canCombo = isWindowOpen;
+        OnStateChanged?.Invoke(newState);
     }
     
     
