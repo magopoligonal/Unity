@@ -103,7 +103,6 @@ public class PlayerController : MonoBehaviour
         if (input.performed)
         {
             OnAttackPressed?.Invoke();
-            Debug.Log($"PLAYER CONTROLLER: Ataque pressionado");
         }
         
     }

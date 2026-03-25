@@ -157,7 +157,7 @@ public class PlayerMovement : MonoBehaviour
     private void CheckStrongAttack(bool isInStrongAttack)
     {
         if (isInStrongAttack)
-            _rb.AddForceX(-(_horizontalMovement*0.8f), ForceMode2D.Impulse);
+            _rb.AddForceX(-(_horizontalMovement*0.99f), ForceMode2D.Impulse);
     }
     
 }

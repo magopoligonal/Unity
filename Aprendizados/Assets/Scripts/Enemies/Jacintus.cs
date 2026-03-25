@@ -24,7 +24,7 @@ using UnityEngine;
         public override void TakeDamage(int amount) //então aqui em tese o player vai dar o dano amount mas o Jacintus tirara o valor da armadura?
         {
             int finalDamage = amount - Armor;
-            Debug.Log($"{this.gameObject.name} tomou: {finalDamage} de dano.");
+            Debug.Log($"{this.gameObject.name} tomou: {finalDamage} de dano. No frame {Time.frameCount}");
             base.TakeDamage(finalDamage);
             if (Health <= 0)
             {

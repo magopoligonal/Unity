@@ -8,7 +8,9 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private Transform _attackPoint;
     [SerializeField] private float _attackRadius;
     [SerializeField] private LayerMask _enemyLayer;
-    [SerializeField, Range(0.2f, 2f)] private float[] comboWindowDurations = { 0.2f, 0.2f, 1.2f};
+    [SerializeField, Range(20, 60)] private int[] comboWindowFrameAmount = { 20, 20, 20 };
+    
+    
     private bool _hitboxActive;
     private bool _comboWindowOpen = false;
     private int _currentCombo;
@@ -40,8 +42,16 @@ public class PlayerCombat : MonoBehaviour
     //serão chamados no animation event
     public void EnableHitbox()
     {
-        _hitboxActive = true;
-        CheckHit();
+        
+            // Forçamos o reset de qualquer estado anterior de hit
+            _hitboxActive = false; 
+    
+            // Pequeno delay ou verificação: só ativa se o estado atual do Animator 
+            // for realmente um estado de ataque (evita disparos em transições fantasmas)
+            Debug.Log($"EnableHitbox disparado. Combo Atual: {_currentCombo}");
+    
+            _hitboxActive = true;
+            CheckHit();
     }
 
     public void DisableHitbox()
@@ -56,34 +66,53 @@ public class PlayerCombat : MonoBehaviour
     /// </summary>
     private void CheckHit()
     {
+        Debug.Log($"CheckHit chamado no frame: {Time.frameCount}");
         Collider2D[] hit = Physics2D.OverlapCircleAll(_attackPoint.position, _attackRadius, _enemyLayer);
         if(hit.Length > 0)
             {
                 OnHit?.Invoke(hit);
-                Debug.Log("Hitamos algo!");
+                Debug.Log($"OnHit invocado no frame: {Time.frameCount}");
+
             }
     }
 
     //combo mechanics
     private void OpenComboWindow() //vai ser chamado no animation event
     {
+        //evento para o playerMovement
         _comboWindowOpen = true;
         OnComboWindowOpen?.Invoke(_comboWindowOpen);
         
-        int index = Mathf.Clamp(_currentCombo - 1, 0, comboWindowDurations.Length - 1);
-        _comboWindowRoutine = StartCoroutine(ComboTimeOut(comboWindowDurations[index]));
+        //Para a Coroutine anterior caso haja 
+        if (_comboWindowRoutine != null)
+        {
+            StopCoroutine(_comboWindowRoutine);
+            _comboWindowRoutine = null;
+            Debug.Log($"Coroutine pausada: {Time.frameCount}  | Combo atual: {_currentCombo}  | Hitbox: {_hitboxActive}");
+        }
+        
+        //Inicia uma nova corotina com o tempo customizavel
+        int index = Mathf.Clamp(_currentCombo - 1, 0, comboWindowFrameAmount.Length - 1); //forma de facilitar para por os timers direto do inspector sem estourar o array
+        _comboWindowRoutine = StartCoroutine(ComboTimeOut(comboWindowFrameAmount[index]));
+        Debug.Log($"Coroutine iniciada: {Time.frameCount}  | Combo atual: {_currentCombo}  | Hitbox: {_hitboxActive}");
+        
+        
     }
     
-    private IEnumerator ComboTimeOut(float windowOpenTimerInSeconds)
+    private IEnumerator ComboTimeOut(float windowOpenTimerInFrames)
     {
+        //essencial
         int comboAtStart = _currentCombo;
-        //if (comboAtStart == 3)
-          //  windowOpenTimerInSeconds += 1f;
-        yield return new WaitForSeconds(windowOpenTimerInSeconds);
-        _comboWindowOpen = false;
-        OnComboWindowOpen?.Invoke(_comboWindowOpen);
+        for(int i = 0; i < windowOpenTimerInFrames; i++)
+            yield return null;
+        //yield return new WaitForSeconds(windowOpenTimerInFrames);
+        
         if(_currentCombo == comboAtStart)
             PlayerController.ChangeState(PlayerController.PlayerState.Idle); // <-- dessa forma não precisamos do OnAttackAnimationEnd para checar se acabou a animação
+        
+        //evento para o playerMovement
+        _comboWindowOpen = false;
+        OnComboWindowOpen?.Invoke(_comboWindowOpen);
     }
     
     
@@ -114,6 +143,9 @@ public class PlayerCombat : MonoBehaviour
 
     private void TryCombo()
     {
+        Debug.Log($"TryCombo chamado, _currentCombo: {_currentCombo}, _comboWindowOpen: {_comboWindowOpen}");
+        //if (_currentCombo == 3) return; //melhorar isso depois
+        _hitboxActive = false;
         switch (_currentCombo)
         {
             case 0:
