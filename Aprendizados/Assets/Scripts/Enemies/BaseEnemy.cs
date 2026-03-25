@@ -42,6 +42,6 @@ public abstract class BaseEnemy : MonoBehaviour, IDamageable
     }
 
     //métodos Abstract
-    protected abstract void HandleHit(Collider2D[] collider); //dai cada inimigo implementa a forma como vai lidar?
+    protected abstract void HandleHit(Collider2D[] collider, int weaponDamage); //dai cada inimigo implementa a forma como vai lidar?
     protected abstract void Die();
 }

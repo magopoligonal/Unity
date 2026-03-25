@@ -20,17 +20,17 @@ AnimationClip:
   m_PPtrCurves:
   - serializedVersion: 2
     curve:
-    - time: 0.25
+    - time: 0
       value: {fileID: 205695764, guid: b4776513e207157f0bf867aedb236028, type: 3}
-    - time: 0.33333334
+    - time: 0.083333336
       value: {fileID: 651306564, guid: b4776513e207157f0bf867aedb236028, type: 3}
-    - time: 0.41666666
+    - time: 0.16666667
       value: {fileID: 630315089, guid: b4776513e207157f0bf867aedb236028, type: 3}
-    - time: 0.5
+    - time: 0.25
       value: {fileID: 1395164639, guid: b4776513e207157f0bf867aedb236028, type: 3}
-    - time: 0.5833333
+    - time: 0.33333334
       value: {fileID: 1077923582, guid: b4776513e207157f0bf867aedb236028, type: 3}
-    - time: 0.6666667
+    - time: 0.41666666
       value: {fileID: 1941796120, guid: b4776513e207157f0bf867aedb236028, type: 3}
     attribute: m_Sprite
     path: 
@@ -65,7 +65,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.75
+    m_StopTime: 0.5
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -85,21 +85,21 @@ AnimationClip:
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
   m_Events:
-  - time: 0.5
+  - time: 0.25
     functionName: EnableHitbox
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.6666667
+  - time: 0.41666666
     functionName: DisableHitbox
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.6666667
+  - time: 0.41666666
     functionName: OpenComboWindow
     data: 
     objectReferenceParameter: {fileID: 0}

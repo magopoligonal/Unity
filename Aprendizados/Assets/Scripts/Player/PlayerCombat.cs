@@ -9,7 +9,7 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private float _attackRadius;
     [SerializeField] private LayerMask _enemyLayer;
     [SerializeField, Range(20, 60)] private int[] comboWindowFrameAmount = { 20, 20, 20 };
-    
+    [SerializeField] private int[] _weaponDamage = { 1, 2, 2 };
     
     private bool _hitboxActive;
     private bool _comboWindowOpen = false;
@@ -19,7 +19,7 @@ public class PlayerCombat : MonoBehaviour
     
     
     //events
-    public static event Action<Collider2D[]> OnHit;
+    public static event Action<Collider2D[], int> OnHit;
     public static event Action<bool> OnComboWindowOpen;
     
 //methods
@@ -66,11 +66,12 @@ public class PlayerCombat : MonoBehaviour
     /// </summary>
     private void CheckHit()
     {
-        Debug.Log($"CheckHit chamado no frame: {Time.frameCount}");
+        int currentDamage = _weaponDamage[Mathf.Clamp(_currentCombo -1, 0 , _weaponDamage.Length - 1)];
+        
         Collider2D[] hit = Physics2D.OverlapCircleAll(_attackPoint.position, _attackRadius, _enemyLayer);
         if(hit.Length > 0)
             {
-                OnHit?.Invoke(hit);
+                OnHit?.Invoke(hit, currentDamage);
                 Debug.Log($"OnHit invocado no frame: {Time.frameCount}");
 
             }
@@ -144,7 +145,7 @@ public class PlayerCombat : MonoBehaviour
     private void TryCombo()
     {
         Debug.Log($"TryCombo chamado, _currentCombo: {_currentCombo}, _comboWindowOpen: {_comboWindowOpen}");
-        //if (_currentCombo == 3) return; //melhorar isso depois
+        if (_currentCombo == 3) return; //melhorar isso depois
         _hitboxActive = false;
         switch (_currentCombo)
         {

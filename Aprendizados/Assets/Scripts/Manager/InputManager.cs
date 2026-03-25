@@ -19,11 +19,10 @@ public class InputManager : MonoBehaviour
     public void AttackPressed(InputAction.CallbackContext input)
     {
         
-        if (input.performed)
-        {
+       
             
             OnAttack?.Invoke(input);
-        }
+        
     }
 
     public void WalkPressed(InputAction.CallbackContext input)
@@ -35,15 +34,13 @@ public class InputManager : MonoBehaviour
 
     public void JumpPressed(InputAction.CallbackContext input)
     {
-        if(input.performed) //eu devo fazer uma verificao no metodo de playercontroller para ver se o personagem está no chão?
-        {
+        
             OnJump?.Invoke(input);
-        }
+        
     }
 
     public void RunPressed(InputAction.CallbackContext input)
     {
-        //retirado para ver se o valor do input passa corretamente. Não estou conseguindo pegar o input.performed e input.canceled em player movement
         OnRunning?.Invoke(input);
     }
 }

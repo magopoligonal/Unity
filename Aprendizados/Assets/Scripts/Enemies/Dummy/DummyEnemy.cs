@@ -18,7 +18,7 @@ namespace Player
             PlayerCombat.OnHit -= HandleHit;
         }
 
-        private void HandleHit(Collider2D[] hits)
+        private void HandleHit(Collider2D[] hits, int weaponDamage)
         {
             foreach (var hit in hits)
                 Debug.Log($"Atigido: {hit.name}");

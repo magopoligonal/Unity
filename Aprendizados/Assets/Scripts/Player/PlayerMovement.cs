@@ -45,7 +45,7 @@ public class PlayerMovement : MonoBehaviour
         PlayerCollision.OnReachingGround += GroundCheck;
         
         //PlayerCombat
-        PlayerCombat.OnComboWindowOpen += CheckStrongAttack;
+        PlayerCombat.OnComboWindowOpen += ApplyAttackKnockBack;
 
     }
 
@@ -59,7 +59,7 @@ public class PlayerMovement : MonoBehaviour
         PlayerCollision.OnReachingGround -= GroundCheck;
        
         //PlayerCombat
-        PlayerCombat.OnComboWindowOpen -= CheckStrongAttack;
+        PlayerCombat.OnComboWindowOpen -= ApplyAttackKnockBack;
     }
 
     void FixedUpdate()
@@ -154,7 +154,7 @@ public class PlayerMovement : MonoBehaviour
             
     }
 
-    private void CheckStrongAttack(bool isInStrongAttack)
+    private void ApplyAttackKnockBack(bool isInStrongAttack)
     {
         if (isInStrongAttack)
             _rb.AddForceX(-(_horizontalMovement*0.99f), ForceMode2D.Impulse);
