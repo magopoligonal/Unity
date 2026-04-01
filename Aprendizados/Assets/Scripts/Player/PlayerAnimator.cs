@@ -7,6 +7,7 @@ public class PlayerAnimator : MonoBehaviour
 
     //events 
     public static event Action OnAttackFinished;
+    
 
     private void OnEnable()
     {

@@ -112,6 +112,7 @@ public class PlayerMovement : MonoBehaviour
             _rb.AddForceY(_jumpingForce, ForceMode2D.Impulse);
         }
         
+        //TODO -- limpar
         else { Debug.Log("Já está no ar, não trapaceie!"); }
 
     }
@@ -127,8 +128,13 @@ public class PlayerMovement : MonoBehaviour
         {
             if (!_isFalling)
             {
+                float timerCheck = Time.deltaTime;
                 _isFalling = true;
-                OnFalling?.Invoke();
+                if (Mathf.Approximately(timerCheck, Time.deltaTime))
+                {
+                    OnFalling?.Invoke();
+                    Debug.Log("Falling");
+                }
             }
         }
         else

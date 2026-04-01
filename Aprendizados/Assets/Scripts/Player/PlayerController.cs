@@ -1,170 +1,193 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.XR;
-
 
 public class PlayerController : MonoBehaviour
 {
-    //enums
     public enum PlayerState
     {
-        //0-1 Instantaneos
-        Spawning = 0, 
+        // 0-1 Instantâneos
+        Spawning = 0,
         Dead = 1,
-        //2-6 Movimentacao
+        // 2-6 Movimentação
         Idle = 2,
         Walking = 3,
         Running = 4,
         Jumping = 5,
         Falling = 6,
-        //7-x Combate
+        // 7-x Combate
         Attacking01 = 7,
         Attacking02 = 8,
         Attacking03 = 9,
     }
-//variables 
-    //fields
+
+    // Fields
     [SerializeField] private PlayerState _currentPlayerState = PlayerState.Idle;
-    
-    //Properties
-    public bool IsGrounded {get; private set;}
+
+    // Properties
+    [field: SerializeField] public bool IsGrounded { get; private set; }
+    [field: SerializeField] public bool CanCombo { get; private set; }
+
+    // Calculada — lê _currentPlayerState no momento que é consultada, sem Update
+    private bool _isAttacking => _currentPlayerState is PlayerState.Attacking01
+                                                      or PlayerState.Attacking02
+                                                      or PlayerState.Attacking03;
+
     public PlayerState CurrentPlayerState
     {
-        get{ return _currentPlayerState; }
-        set
-        {
-            _currentPlayerState = value;
-        }
+        get => _currentPlayerState;
+        private set => _currentPlayerState = value;
     }
 
-    //Events
-    public static event  Action<PlayerState> OnStateChanged;
+    // Events
+    public static event Action<PlayerState> OnStateChanged;
     public static event Action OnAttackPressed;
-    
-    
 
-//methods
-    //system
-    void OnEnable()
+
+    // System
+    private void OnEnable()
     {
-        //InputManager
+        // InputManager
         InputManager.OnWalking += Walk;
         InputManager.OnRunning += Run;
         InputManager.OnJump += Jump;
         InputManager.OnAttack += Attack;
-        
-        //PlayerController
+
+        // PlayerController
         OnStateChanged += HandleStateChange;
-        
-        //PlayerCollision                  
+
+        // PlayerCollision
         PlayerCollision.OnReachingGround += CheckGround;
 
-        //PlayerMovement
+        // PlayerMovement
         PlayerMovement.OnFalling += CheckFalling;
         PlayerMovement.OnIdle += CheckIdle;
-        
-        //Player Animator
+
+        // PlayerAnimator
         PlayerAnimator.OnAttackFinished += CheckAttackFinished;
-        
-        //Player Combat
-        
+
+        // PlayerCombat
+        PlayerCombat.OnComboWindowOpen += CheckCombo;
+        PlayerCombat.OnComboChange += RequestChangeState;
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
-        //InputManager
+        // InputManager
         InputManager.OnWalking -= Walk;
         InputManager.OnRunning -= Run;
         InputManager.OnJump -= Jump;
         InputManager.OnAttack -= Attack;
-        
-        //PlayerController
+
+        // PlayerController
         OnStateChanged -= HandleStateChange;
-        
-        //PlayerMovement
+
+        // PlayerCollision
+        PlayerCollision.OnReachingGround -= CheckGround;
+
+        // PlayerMovement
         PlayerMovement.OnFalling -= CheckFalling;
         PlayerMovement.OnIdle -= CheckIdle;
-        
-        
-        //PlayerCollision
-        PlayerCollision.OnReachingGround -= CheckGround;
-        
-        //PlayerAnimator
+
+        // PlayerAnimator
         PlayerAnimator.OnAttackFinished -= CheckAttackFinished;
-        
-        //PlayerCombat
-        
+
+        // PlayerCombat
+        PlayerCombat.OnComboWindowOpen -= CheckCombo;
+        PlayerCombat.OnComboChange -= RequestChangeState;
     }
 
-    //playerController
-    private void Attack(InputAction.CallbackContext input) //esse parametro está vindo lá do InputManager
+
+    // Input handlers
+    private void Attack(InputAction.CallbackContext input)
     {
-        if (input.performed)
-        {
+        if (!input.performed) return;
+
+        if (!_isAttacking || CanCombo)
             OnAttackPressed?.Invoke();
-        }
-        
-    }
-
-    private void Run(InputAction.CallbackContext input)
-    {
-        if(input.performed)
-            OnStateChanged?.Invoke(PlayerState.Running); 
     }
 
     private void Walk(InputAction.CallbackContext input)
     {
-        if(input.performed)
-            OnStateChanged?.Invoke(PlayerState.Walking);
+        if (input.performed && input.ReadValue<Vector2>().x != 0)
+            RequestChangeState(PlayerState.Walking);
+    }
+
+    private void Run(InputAction.CallbackContext input)
+    {
+        if (input.performed)
+            RequestChangeState(PlayerState.Running);
     }
 
     private void Jump(InputAction.CallbackContext input)
     {
-        if(!IsGrounded) return;
-        
-        IsGrounded = false; 
-        OnStateChanged?.Invoke(PlayerState.Jumping);
-        
+        if (input.performed && IsGrounded)
+            RequestChangeState(PlayerState.Jumping);
     }
 
+
+    // Event listeners
     private void CheckGround(bool hasHitGround)
     {
         IsGrounded = hasHitGround;
     }
 
+    private void CheckCombo(bool isComboWindowOpened)
+    {
+        CanCombo = isComboWindowOpened;
+    }
+
     private void CheckFalling()
     {
-        OnStateChanged?.Invoke(PlayerState.Falling);
+        RequestChangeState(PlayerState.Falling);
     }
 
     private void CheckIdle()
     {
-        OnStateChanged?.Invoke(PlayerState.Idle);
+        // PlayerMovement não interrompe ataque — só o PlayerCombat encerra via OnComboChange
+        if (_isAttacking) return;
+        RequestChangeState(PlayerState.Idle);
     }
 
     private void CheckAttackFinished()
     {
-        OnStateChanged?.Invoke(PlayerState.Idle);
+        RequestChangeState(PlayerState.Idle);
     }
-
-    public static void ChangeState(PlayerState newState)
-    {
-        OnStateChanged?.Invoke(newState);
-    }
-    
-    
 
     private void HandleStateChange(PlayerState state)
     {
         CurrentPlayerState = state;
     }
 
+
+    // State machine
+    private void RequestChangeState(PlayerState newState)
+    {
+        // Dead não tem saída (exceto Spawning por precaução)
+        if (_currentPlayerState == PlayerState.Dead && newState != PlayerState.Spawning) return;
+
+        // Sem mudança
+        if (_currentPlayerState == newState) return;
+
+        // Durante ataque: só Idle, Dead e ataques do combo podem interromper
+        if (_isAttacking)
+        {
+            bool canInterrupt = newState is PlayerState.Idle
+                                         or PlayerState.Dead
+                                         or PlayerState.Attacking01
+                                         or PlayerState.Attacking02
+                                         or PlayerState.Attacking03;
+            if (!canInterrupt) return;
+        }
+
+        // Pulo só no chão
+        if (newState == PlayerState.Jumping && !IsGrounded) return;
+
+        // Running só a partir de Walking
+        if (newState == PlayerState.Running && _currentPlayerState != PlayerState.Walking) return;
+
+        // Transiciona
+        _currentPlayerState = newState;
+        OnStateChanged?.Invoke(_currentPlayerState);
+    }
 }
-
-
-
-/*
-* Aqui será executado o controle da jogabilidade exercido pelas outras classes como PlayerMovement que controla o movimento do jogador
-* a partir da escuta de eventos
-*/
